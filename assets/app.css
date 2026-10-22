@@ -1,0 +1,902 @@
+/* komi — one stylesheet, no framework.
+   The board is the only ornamented thing on the page; everything else is kept
+   quiet so that stones and game rows read first. */
+
+:root {
+  color-scheme: dark;
+
+  --bg: #101216;
+  --bg-soft: #15181e;
+  --panel: #191d24;
+  --panel-2: #1e232b;
+  --line: #2a303a;
+  --line-soft: #232830;
+  --text: #e8eaf0;
+  --muted: #929aab;
+  --quiet: #6f7789;
+  --accent: #e2a941;
+  --accent-soft: #3a2d13;
+  --you: #56a877;
+  --danger: #e06c66;
+
+  --wood: #d9b566;
+  --wood-2: #cbaa5b;
+  --wood-line: #9c7a3b;
+
+  --radius: 10px;
+  --radius-sm: 7px;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px -12px rgb(0 0 0 / 0.55);
+  --ring: 0 0 0 2px var(--accent-soft), 0 0 0 3px var(--accent);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: radial-gradient(1200px 600px at 50% -10%, #171b22 0%, var(--bg) 55%);
+  color: var(--text);
+  // The CJK families matter: the default stack renders Chinese and Japanese
+  // with fallback faces that differ wildly between platforms.
+  font: 16px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Noto Sans", "Noto Sans CJK SC", "Noto Sans CJK JP", "Noto Sans CJK KR",
+    "Hiragino Sans", "Yu Gothic UI", Meiryo, "Malgun Gothic", "Apple SD Gothic Neo",
+    "Microsoft YaHei", sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+  text-underline-offset: 2px;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  line-height: 1.25;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+h1 {
+  font-size: clamp(1.35rem, 1rem + 1.2vw, 1.75rem);
+}
+
+h2 {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+
+p {
+  margin: 0.35rem 0;
+}
+
+.quiet {
+  color: var(--quiet);
+}
+
+/* ------------------------------------------------------------- structure */
+
+header.site {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.7rem 1.25rem;
+  border-bottom: 1px solid var(--line-soft);
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter: blur(10px);
+}
+
+header.site .brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+header.site .brand:hover {
+  text-decoration: none;
+  color: var(--accent);
+}
+
+.brand-mark {
+  color: var(--accent);
+  font-size: 0.8rem;
+  transform: translateY(-1px);
+}
+
+nav.account {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  font-size: 0.95rem;
+}
+
+nav.account form {
+  margin: 0;
+}
+
+a.who {
+  color: var(--text);
+  font-weight: 600;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+}
+
+a.who:hover {
+  text-decoration: none;
+  border-color: var(--muted);
+}
+
+main {
+  flex: 1;
+  width: min(58rem, 100%);
+  margin: 0 auto;
+  padding: 1.75rem 1.25rem 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+footer.site {
+  padding: 1.4rem 1.25rem 2rem;
+  text-align: center;
+  color: var(--quiet);
+  font-size: 0.82rem;
+}
+
+/* ---------------------------------------------------------------- blocks */
+
+.hero {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.lede {
+  color: var(--muted);
+  max-width: 46ch;
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.15rem 1.25rem;
+  box-shadow: var(--shadow);
+}
+
+.card.narrow {
+  max-width: 34rem;
+}
+
+.card > h2 {
+  margin-bottom: 0.35rem;
+}
+
+.hint {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.error {
+  color: var(--danger);
+  font-size: 0.92rem;
+}
+
+.ok {
+  color: var(--you);
+  font-size: 0.92rem;
+}
+
+.empty {
+  margin: 0;
+  padding: 1.6rem 1.1rem;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+  color: var(--muted);
+  text-align: center;
+}
+
+.links {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+  font-size: 0.92rem;
+}
+
+/* --------------------------------------------------------------- buttons */
+
+button,
+a.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  background: var(--accent);
+  color: #231a06;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.95rem;
+  font: inherit;
+  font-weight: 650;
+  font-size: 0.93rem;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: filter 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+
+button:hover,
+a.button:hover {
+  filter: brightness(1.08);
+  text-decoration: none;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  outline: none;
+  box-shadow: var(--ring);
+}
+
+button.ghost {
+  background: transparent;
+  color: var(--text);
+  border-color: var(--line);
+  font-weight: 550;
+}
+
+button.ghost:hover {
+  border-color: var(--muted);
+  filter: none;
+}
+
+button.small,
+a.button.small {
+  padding: 0.3rem 0.7rem;
+  font-size: 0.86rem;
+  font-weight: 550;
+}
+
+/* ---------------------------------------------------------------- forms */
+
+form.inline {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 0.9rem;
+}
+
+input[type="text"],
+input[type="password"] {
+  flex: 1 1 12rem;
+  min-width: 0;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  padding: 0.5rem 0.7rem;
+  font: inherit;
+  font-size: 0.95rem;
+}
+
+input::placeholder {
+  color: var(--quiet);
+}
+
+/* Choosing a colour is choosing a stone: two stones you click, with the chosen
+   one ringed like a marked stone. The radio itself is present for the keyboard
+   and for the browser, but drawn by us. */
+fieldset.colour {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+fieldset.colour legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.stone-option {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.3rem 0.8rem 0.3rem 0.45rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+
+.stone-option:hover {
+  background: var(--panel-2);
+}
+
+// Selecting is shown by the stone itself (see below), so this pill is only
+// decoration for browsers that support :has(). Nothing depends on it.
+.stone-option:has(input:checked) {
+  background: var(--panel-2);
+  border-color: color-mix(in srgb, var(--accent) 50%, transparent);
+}
+
+.stone-option input:focus-visible + .stone-dot {
+  box-shadow: var(--ring);
+}
+
+/* Out of the way, but still focusable and still announced. */
+.stone-option input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.stone-dot {
+  flex: none;
+  width: 2.05rem;
+  height: 2.05rem;
+  border-radius: 50%;
+  transition: box-shadow 0.12s ease;
+}
+
+.stone-dot-black {
+  background: radial-gradient(circle at 34% 28%, #4c515c, #1c1f26 52%, #07080a 100%);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.55);
+}
+
+.stone-dot-white {
+  background: radial-gradient(circle at 34% 28%, #ffffff, #f0ebdf 58%, #c9c1ae 100%);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.45);
+}
+
+/* The chosen stone wears a ring, the way a reviewed stone does. Sibling
+   selectors, not :has(): the radio is invisible, so the selection must be
+   readable in every browser. */
+.stone-option input:checked + .stone-dot {
+  box-shadow:
+    0 0 0 1px var(--panel-2),
+    0 0 0 3px var(--accent),
+    0 2px 6px rgb(0 0 0 / 0.5);
+}
+
+
+.stone-caption {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.stone-option input:checked ~ .stone-caption {
+  color: var(--accent);
+}
+
+form.stacked {
+  display: grid;
+  gap: 0.35rem;
+  margin-top: 0.85rem;
+  max-width: 22rem;
+}
+
+form.stacked label {
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin-top: 0.4rem;
+}
+
+form.stacked button {
+  margin-top: 0.8rem;
+  justify-self: start;
+}
+
+/* --------------------------------------------------------------- toolbar */
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.25rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.8rem;
+}
+
+.toolbar h2 {
+  margin: 0;
+}
+
+.chips {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.toolbar-label {
+  color: var(--quiet);
+  font-size: 0.8rem;
+  margin-right: 0.2rem;
+}
+
+.chip {
+  padding: 0.28rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.84rem;
+  white-space: nowrap;
+}
+
+.chip:hover {
+  color: var(--text);
+  border-color: var(--muted);
+  text-decoration: none;
+}
+
+.chip.chip-on {
+  background: var(--accent-soft);
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.chips-sort .chip {
+  border-color: transparent;
+  padding: 0.28rem 0.5rem;
+}
+
+.chips-sort .chip.chip-on {
+  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+/* ----------------------------------------------------------------- rows */
+
+ul.games {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+li.game {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.6rem 0.8rem;
+  background: var(--panel);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius);
+  transition: border-color 0.12s ease, transform 0.12s ease;
+}
+
+li.game:hover {
+  border-color: var(--line);
+}
+
+/* A row that is waiting on you is worth a glance. */
+li.game:has(.badge-you) {
+  border-color: color-mix(in srgb, var(--you) 40%, var(--line));
+}
+
+a.preview {
+  display: block;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 7px;
+  overflow: hidden;
+  line-height: 0;
+  transition: transform 0.12s ease;
+}
+
+li.game:hover a.preview {
+  transform: scale(1.03);
+}
+
+.game-main {
+  min-width: 0;
+}
+
+a.game-title {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  color: var(--text);
+  font-weight: 600;
+}
+
+a.game-title:hover {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a.game-title .vs {
+  color: var(--quiet);
+  font-weight: 400;
+  font-size: 0.82rem;
+}
+
+.game-meta {
+  margin: 0.1rem 0 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.game-side {
+  margin: 0;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.1rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.badge-you {
+  background: color-mix(in srgb, var(--you) 18%, transparent);
+  border-color: color-mix(in srgb, var(--you) 55%, transparent);
+  color: var(--you);
+}
+
+.badge-waiting {
+  border-style: dashed;
+}
+
+.badge-finished {
+  opacity: 0.6;
+  text-decoration: line-through;
+  text-decoration-color: var(--quiet);
+}
+
+.banner {
+  background: var(--panel-2);
+  border-left: 3px solid var(--accent);
+  border-radius: 4px;
+  padding: 0.65rem 0.85rem;
+  color: var(--muted);
+}
+
+/* ------------------------------------------------------------ game page */
+
+.game-card {
+  display: grid;
+  gap: 1rem;
+  width: min(34rem, 100%);
+  margin: 0 auto;
+}
+
+.game-head {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.game-head h1 {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.game-head .vs {
+  color: var(--quiet);
+  font-size: 0.85rem;
+  font-weight: 400;
+}
+
+.status {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  padding-top: 0.25rem;
+  border-top: 1px solid var(--line-soft);
+}
+
+.actions form {
+  margin: 0;
+}
+
+.actions .hint {
+  margin: 0;
+}
+
+button.pass {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--line);
+}
+
+/* ---------------------------------------------------------------- board */
+
+.board-wrap {
+  position: relative;
+  width: 100%;
+  margin: 0.25rem auto;
+  aspect-ratio: 1 / 1;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 18px 40px -24px rgb(0 0 0 / 0.9);
+}
+
+svg.board {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+}
+
+.board:not(.board-mini) .board-bg {
+  fill: url(#wood);
+}
+
+.board-mini .board-bg {
+  fill: var(--wood);
+}
+
+.board-rim {
+  fill: none;
+  stroke: rgb(0 0 0 / 0.38);
+  stroke-width: 2;
+}
+
+.grid-line {
+  stroke: var(--wood-line);
+  stroke-width: 1;
+  stroke-linecap: square;
+}
+
+.star {
+  fill: var(--wood-line);
+}
+
+.coord {
+  fill: #6d5620;
+  font-size: 9.5px;
+  font-family: inherit;
+  font-weight: 500;
+}
+
+.board:not(.board-mini) .stone {
+  filter: url(#stone-shadow);
+}
+
+.board:not(.board-mini) .stone-black {
+  fill: url(#stone-black);
+}
+
+.board:not(.board-mini) .stone-white {
+  fill: url(#stone-white);
+}
+
+.board-mini .stone-black {
+  fill: #14161a;
+}
+
+.board-mini .stone-white {
+  fill: #f2efe7;
+}
+
+/* A preview has no coordinate labels, so its lines may be a touch heavier to
+   survive being scaled down to a few dozen pixels. */
+.board-mini .grid-line {
+  stroke-width: 2;
+  opacity: 0.5;
+}
+
+.board-mini .last-move {
+  fill: none;
+  stroke: var(--danger);
+  stroke-width: 5;
+}
+
+.last-move {
+  fill: none;
+  stroke: var(--danger);
+  stroke-width: 2.1;
+}
+
+/* One invisible button per empty intersection. The ghost stone is this
+   pseudo-element, tinted by the turn class on the wrapper. */
+.board-wrap.turn-black,
+.board-wrap.turn-white {
+  cursor: crosshair;
+}
+
+button.point {
+  position: absolute;
+  width: 5.4%;
+  aspect-ratio: 1 / 1;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+}
+
+button.point::after {
+  content: "";
+  position: absolute;
+  inset: 8%;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.1s ease;
+  pointer-events: none;
+}
+
+.turn-black button.point::after {
+  background: radial-gradient(circle at 34% 28%, #4c515c, #0b0c10 70%);
+}
+
+.turn-white button.point::after {
+  background: radial-gradient(circle at 34% 28%, #ffffff, #cfc7b6 75%);
+}
+
+button.point:hover::after,
+button.point:focus-visible::after {
+  opacity: 0.45;
+}
+
+button.point:hover,
+button.point:focus-visible {
+  box-shadow: none;
+}
+
+button.point:focus-visible::after {
+  opacity: 0.7;
+}
+
+/* ------------------------------------------------------------ move list */
+
+.movelist {
+  overflow-x: auto;
+}
+
+.movelist table {
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.movelist th {
+  text-align: left;
+  color: var(--quiet);
+  font-weight: 600;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.2rem 1rem 0.2rem 0;
+}
+
+.movelist td {
+  padding: 0.18rem 1rem 0.18rem 0;
+  border-top: 1px solid var(--line-soft);
+  min-width: 4.5rem;
+}
+
+.movelist td.num {
+  color: var(--quiet);
+  min-width: 2.2rem;
+}
+
+/* ------------------------------------------------------------ responsive */
+
+@media (max-width: 34rem) {
+  main {
+    padding: 1.25rem 0.9rem 3rem;
+    gap: 1.15rem;
+  }
+
+  li.game {
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      "preview main"
+      "side side";
+  }
+
+  a.preview {
+    grid-area: preview;
+    width: 3rem;
+    height: 3rem;
+  }
+
+  .game-main {
+    grid-area: main;
+  }
+
+  .game-side {
+    grid-area: side;
+    justify-self: start;
+  }
+
+  form.inline {
+    align-items: stretch;
+  }
+
+  input[type="text"],
+  input[type="password"] {
+    flex-basis: 100%;
+  }
+}
+
+/* ------------------------------------------------------------------ i18n */
+
+/* CJK text needs a little more room between lines than Latin does. */
+:lang(zh),
+:lang(ja),
+:lang(ko) {
+  line-height: 1.75;
+}
+
+nav.langs {
+  display: flex;
+  align-items: center;
+  gap: 0.1rem;
+  margin-left: auto;
+  margin-right: 0.4rem;
+}
+
+a.lang {
+  padding: 0.18rem 0.42rem;
+  border-radius: 999px;
+  color: var(--quiet);
+  font-size: 0.76rem;
+  line-height: 1.4;
+}
+
+a.lang:hover {
+  color: var(--text);
+  background: var(--panel-2);
+  text-decoration: none;
+}
+
+a.lang.lang-on {
+  color: var(--accent);
+  background: var(--accent-soft);
+  font-weight: 600;
+}

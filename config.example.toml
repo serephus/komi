@@ -1,0 +1,57 @@
+# komi configuration.
+#
+# Read from, in order: $KOMI_CONFIG, /etc/komi/config.toml, ./komi.toml.
+# Or pass one explicitly: komi --config /path/to/config.toml
+#
+# Every key is optional; the value shown is the default. Unknown keys are an
+# error, so a typo is reported instead of silently ignored.
+
+# Address to listen on. Bind to 0.0.0.0 only behind a reverse proxy, and see
+# secure_cookies below if you do.
+bind = "127.0.0.1:8081"
+
+# redb database file. The directory is created if it does not exist.
+database = "komi.redb"
+
+# Shown in the header and the page title.
+site_name = "komi"
+
+# Default log filter; RUST_LOG overrides it.
+log = "info"
+
+# Mark the session cookie Secure. Omitted means "on unless bind is a loopback
+# address", which is right for both plain local play and a public instance.
+# secure_cookies = true
+
+# Behind a reverse proxy, take the client address from X-Forwarded-For /
+# X-Real-IP so that rate limiting sees the real client.
+trust_proxy = false
+
+# Set to false for a private instance: the sign-up page disappears and the
+# endpoints refuse new accounts.
+allow_registration = true
+# Language shown when the visitor has no preference: en, zh, ja or ko.
+default_language = "en"
+
+# Fallback refresh interval in seconds, for browsers that cannot use the live
+# update stream. With the stream, pages refresh as soon as anything changes.
+refresh_seconds = 30
+
+[session]
+# Days a session survives without being used (1-3650).
+days = 30
+
+[lobby]
+# A game with a free seat is an advertisement. After this many days without
+# activity it stops being listed (the link still works). 0 keeps them forever.
+stale_open_days = 14
+
+[limits]
+# Failed logins from one address before it is locked out for the window.
+login_attempts = 10
+login_window_minutes = 15
+
+# Accounts creatable from one address per window. To close sign-up entirely,
+# use allow_registration above instead.
+registration_attempts = 5
+registration_window_minutes = 60
