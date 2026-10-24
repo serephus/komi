@@ -129,9 +129,13 @@ Options mirror the config keys: `address`, `port`, `siteName`, `stateDir`,
 for anything without an option.
 
 The database lives at `stateDir` (`/var/lib/komi` by default), owned by a
-dedicated `komi` user, and the unit runs with `ProtectSystem=strict`, an empty
-capability set (plus `CAP_NET_BIND_SERVICE` when the port is below 1024) and
-`ReadWritePaths` limited to that directory. Backing up a game history is copying
+dedicated `komi` user. For the default path systemd itself creates the directory
+and takes ownership of it on every start (`StateDirectory`), which is what keeps
+a directory left behind by an earlier deployment from locking the service out;
+a `chown -R` runs before the service starts as a second line of defence. The unit
+runs with `ProtectSystem=strict`, an empty capability set (plus
+`CAP_NET_BIND_SERVICE` when the port is below 1024), and only the state directory
+writable. Backing up a game history is copying
 one redb file, taken while the service is stopped: redb holds a lock on it while
 open, and a second process cannot open it either, which is also why the server
 waits briefly at startup if a restart overtakes the old process.
