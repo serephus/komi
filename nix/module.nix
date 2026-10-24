@@ -63,6 +63,16 @@ let
 
   needsBindPort = cfg.port < 1024;
   defaultUser = "komi";
+  defaultStateDir = "/var/lib/komi";
+
+  # systemd can only manage a state directory under /var/lib itself. When the
+  # path is the default one it does, which fixes ownership on every start
+  # instead of only at boot; anywhere else we fall back to tmpfiles.
+  managedStateDir =
+    if cfg.stateDir == defaultStateDir then
+      baseNameOf cfg.stateDir
+    else
+      null;
 in
 {
   options.services.komi = {
@@ -288,9 +298,8 @@ in
       ${defaultUser} = { };
     };
 
-    systemd.tmpfiles.rules = [
-      "d '${cfg.stateDir}' 0750 ${cfg.user} ${cfg.group} -"
-    ];
+    systemd.tmpfiles.rules = lib.optional (managedStateDir == null)
+      "d '${cfg.stateDir}' 0750 ${cfg.user} ${cfg.group} -";
 
     systemd.services.komi = {
       description = "komi correspondence Go server";
@@ -307,9 +316,21 @@ in
         WorkingDirectory = cfg.stateDir;
         Restart = "on-failure";
         RestartSec = 5;
-        # The database and its WAL files are the only things written.
-        ReadWritePaths = [ cfg.stateDir ];
         UMask = "0077";
+
+        # The database is the only thing written. systemd creates and owns the
+        # default /var/lib/komi itself, before the sandbox is set up and on every
+        # start, which is what keeps a directory left behind by an older
+        # deployment from locking the service out.
+        StateDirectory = lib.mkIf (managedStateDir != null) managedStateDir;
+        StateDirectoryMode = lib.mkIf (managedStateDir != null) "0750";
+        ReadWritePaths = lib.optional (managedStateDir == null) cfg.stateDir;
+
+        # Belt and braces for the file itself: take ownership of anything a
+        # previous run (or a root shell) left in the state directory.
+        ExecStartPre = [
+          "-+${pkgs.coreutils}/bin/chown -R '${cfg.user}:${cfg.group}' '${cfg.stateDir}'"
+        ];
 
         # Boring, well understood hardening. Deliberately no SystemCallFilter:
         # File locking and fsync paths are exactly the kind of thing a hand
