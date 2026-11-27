@@ -6,8 +6,8 @@
       url = "github:oxalica/rust-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    naersk = {
-      url = "github:nix-community/naersk";
+    crate2nix = {
+      url = "github:nix-community/crate2nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixit = {
@@ -15,7 +15,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
       inputs.rust-overlay.follows = "rust-overlay";
-      inputs.naersk.follows = "naersk";
     };
   };
 
@@ -26,7 +25,7 @@
       flake-utils,
       nixit,
       rust-overlay,
-      naersk,
+      crate2nix,
       ...
     }:
     let
@@ -122,7 +121,10 @@
             "rust-analyzer"
           ];
         };
-        naersk' = pkgs.callPackage naersk { };
+        cargoNix = crate2nix.tools.${system}.appliedCargoNix {
+          name = "komi";
+          src = ./.;
+        };
 
         # Evaluating a system with the module enabled, so that `nix flake check`
         # fails if the module's options or its generated configuration break.
@@ -138,7 +140,7 @@
         };
       in
       {
-        packages.default = naersk'.buildPackage ./.;
+        packages.default = cargoNix.rootCrate.build;
 
         checks.komi-nixos-module = komiModuleSystem.config.services.komi.configFile;
 
