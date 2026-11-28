@@ -29,7 +29,7 @@ tokio-stream = { version = "0.1", features = ["sync"] }
 tower-http = { version = "0.7", features = ["compression-gzip", "trace"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
-redb = "4.4.0"
+redb = "5.0.0"
 
 [profile.release]
 lto = "thin"
